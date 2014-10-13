@@ -14,8 +14,6 @@ class KupNajistoApi
     /** @var string  */
     private $token = '';
 
-    
-
     /**
      * Performs POST login request
      * @param  string $username
@@ -35,13 +33,12 @@ class KupNajistoApi
     /**
      * Performs POST request to create order
      * @param  array $data
+     * @return array $response json response
      */
     public function createOrder($data = array())
     {
-        // TODO: data
         try {
-            $response = $this->request('POST', 'order/api/');
-            return $response;
+            return $this->request('POST', 'order/api/', $data);
         } catch (Exception $e) {
             throw $e;
         }
@@ -50,6 +47,7 @@ class KupNajistoApi
     /**
      * Performs PUT request to create order
      * @param  array $data
+     * @return array $response json response
      */
     public function confirmOrder($id = NULL)
     {
@@ -60,13 +58,13 @@ class KupNajistoApi
      * Performs PUT request to update order
      * @param  int $id
      * @param  array $data
+     * @return array $response json response
      */
-    public function updateOrder($id = NULL, $data = array())
+    public function updateOrder($id = NULL, $data = NULL)
     {
         // TODO: data
         try {
-            $response = $this->request('PUT', 'order/api/'.$id);
-            return $response;
+            return $this->request('PUT', 'order/api/'.$id.'/', $data);
         } catch (Exception $e) {
             throw $e;
         }
@@ -77,7 +75,7 @@ class KupNajistoApi
      * @param string $method
      * @param string $url
      * @param array $data
-     * @return mixed
+     * @return array $response json response
      * @throws Error
      */
     private function request($method, $url, $data = NULL)
@@ -88,14 +86,20 @@ class KupNajistoApi
             $headers[] = 'Authorization: '.$this->token;
         }
 
+        if ($data !== NULL) {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+        }
+
+        if ($method == 'PUT') {
+            $len = ($data === NULL)?0:strlen(json_encode($data));
+            $headers[] = 'Content-Length: '.$len;
+        }
+
+
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($curl, CURLOPT_URL, $this->apiUrl . $url);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-
-        if ($data !== NULL) {
-            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-        }
 
         $response = curl_exec($curl);
 
@@ -104,7 +108,7 @@ class KupNajistoApi
         }
 
         $info = curl_getinfo($curl);
-        if ($info['http_code'] !== 200) {
+        if ( !in_array($info['http_code'], array(200, 201)) ) {
             if ($info['http_code'] === 403) {
                 throw new Exception('{ "messages": { "error": "Token expired" } }');
             }
