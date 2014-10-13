@@ -14,6 +14,64 @@ class KupNajistoApi
     /** @var string  */
     private $token = '';
 
+    
+
+    /**
+     * Performs POST login request
+     * @param  string $username
+     * @param  string $password
+     */
+    public function login($username = '', $password = '')
+    {
+        try {
+            $response = $this->request('POST', 'login/api/', compact('username', 'password'));
+            $this->token = $response['token'];
+            return $response;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Performs POST request to create order
+     * @param  array $data
+     */
+    public function createOrder($data = array())
+    {
+        // TODO: data
+        try {
+            $response = $this->request('POST', 'order/api/');
+            return $response;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Performs PUT request to create order
+     * @param  array $data
+     */
+    public function confirmOrder($id = NULL)
+    {
+        return $this->updateOrder($id);
+    }
+
+    /**
+     * Performs PUT request to update order
+     * @param  int $id
+     * @param  array $data
+     */
+    public function updateOrder($id = NULL, $data = array())
+    {
+        // TODO: data
+        try {
+            $response = $this->request('PUT', 'order/api/'.$id);
+            return $response;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
     /**
      * Perform an API request
      * @param string $method
