@@ -2,30 +2,48 @@
 
 class KupNajistoApi
 {
-    /** @var string  */
-    private $apiUrl = 'http://knj.rychmat.eu/';
+    const VERSION = '0.0.1';
+
+    /** @var string auth token  */
+    private static $token = '';
 
     /** @var array  */
     private $headers = array(
-        'Accept: application/json',
-        'Content-Type: application/json'
+        'Accept' => 'Accept: application/json',
+        'Content-Type' => 'Content-Type: application/json'
     );
 
     /** @var string  */
-    private $token = '';
+    private $apiUrl = 'https://app.kupnajisto.cz'; // http://knj.rychmat.eu/
+
+    /** @var string  */
+    private $username = '';
+
+    /** @var string  */
+    private $password = '';
+
+    public function KupNajistoApi($username = '', $password = '', $url = '') {
+
+        $this->username = $username;
+        $this->password = $password;
+        $this->apiUrl = $url;
+
+        $this->login($username, $password);
+    }
 
     /**
      * Performs POST login request
      * @param  string $username
      * @param  string $password
      */
-    public function login($username = '', $password = '')
+    private function login($username = '', $password = '')
     {
         try {
             $response = $this->request('POST', 'login/api/', compact('username', 'password'));
-            $this->token = $response['token'];
+            self::$token = $response['token'];
+            $this->headers['Authorization'] = 'Authorization: '.self::$token;
             return $response;
-        } catch (Exception $e) {
+        } catch (KupNajistoException $e) {
             throw $e;
         }
     }
@@ -39,7 +57,7 @@ class KupNajistoApi
     {
         try {
             return $this->request('POST', 'order/api/', $data);
-        } catch (Exception $e) {
+        } catch (KupNajistoException $e) {
             throw $e;
         }
     }
@@ -51,7 +69,7 @@ class KupNajistoApi
      */
     public function confirmOrder($id = NULL)
     {
-        return $this->updateOrder($id);
+        return $this->updateOrder($id, array());
     }
 
     /**
@@ -62,41 +80,35 @@ class KupNajistoApi
      */
     public function updateOrder($id = NULL, $data = NULL)
     {
-        // TODO: data
         try {
             return $this->request('PUT', 'order/api/'.$id.'/', $data);
-        } catch (Exception $e) {
+        } catch (KupNajistoException $e) {
             throw $e;
         }
     }
 
-    /**
+    /*
      * Perform an API request
      * @param string $method
      * @param string $url
      * @param array $data
      * @return array $response json response
-     * @throws Error
+     * @throws KupNajistoException if any error occur
      */
     private function request($method, $url, $data = NULL)
     {
         $curl = curl_init();
-        $headers = $this->headers;
-        if ($this->token != '') {
-            $headers[] = 'Authorization: '.$this->token;
-        }
 
         if ($data !== NULL) {
             curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
         }
 
-        if ($method == 'PUT') {
-            $len = ($data === NULL)?0:strlen(json_encode($data));
-            $headers[] = 'Content-Length: '.$len;
+        if (in_array($method, array('POST', 'PUT'))) {
+            $len = ($data === NULL)? 0 : strlen(json_encode($data));
+            $this->headers['Content-Length'] = 'Content-Length: '.$len;
         }
 
-
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array_values($this->headers));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($curl, CURLOPT_URL, $this->apiUrl . $url);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
@@ -104,21 +116,32 @@ class KupNajistoApi
         $response = curl_exec($curl);
 
         if (curl_errno($curl)) {
-            throw new Error('Curl error: ' . curl_error($curl));
+            echo 'z';
+            throw new KupNajistoException('Curl error: ' . curl_error($curl));
         }
 
         $info = curl_getinfo($curl);
         if ( !in_array($info['http_code'], array(200, 201)) ) {
             if ($info['http_code'] === 403) {
-                throw new Exception('{ "messages": { "error": "Token expired" } }');
+                // TODO: autologin
+                throw new KupNajistoException('{ "messages": { "error": "Token expired" } }');
             }
-            throw new Exception($response);
+            throw new KupNajistoException($response);
         }
 
         curl_close($curl);
 
         return json_decode($response, TRUE);
     }
+
+}
+
+/**
+ * Custom exception class
+ */
+class KupNajistoException extends Exception
+{
+    
 }
 
 ?>
