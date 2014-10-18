@@ -1,9 +1,16 @@
 <?php
 
+/**
+ * API for payment method Kup Najisto
+ * http://www.kupnajisto.cz/
+ * 
+ * @link https://github.com/Usertech/Kup-Najisto-API-PHP
+ * @author Michal Vlcek <vlcek@usertechnologies.com>
+ * @copyright 2014 UserTechnologies s.r.o. - http://usertechnologies.com/
+ * @version 0.1
+ */
 class KupNajistoApi
 {
-    const VERSION = '0.0.1';
-
     /** @var string auth token  */
     private static $token = '';
 
@@ -14,13 +21,16 @@ class KupNajistoApi
     );
 
     /** @var string  */
-    private $apiUrl = 'https://app.kupnajisto.cz'; // http://knj.rychmat.eu/
+    private $apiUrl = 'https://app.kupnajisto.cz';
 
     /** @var string  */
     private $username = '';
 
     /** @var string  */
     private $password = '';
+
+    /** @var boolean  */
+    private $retry = TRUE;
 
     public function KupNajistoApi($username = '', $password = '', $url = '') {
 
@@ -116,17 +126,25 @@ class KupNajistoApi
         $response = curl_exec($curl);
 
         if (curl_errno($curl)) {
-            echo 'z';
             throw new KupNajistoException('Curl error: ' . curl_error($curl));
         }
 
         $info = curl_getinfo($curl);
         if ( !in_array($info['http_code'], array(200, 201)) ) {
+            // expired token - try autologin
             if ($info['http_code'] === 403) {
-                // TODO: autologin
-                throw new KupNajistoException('{ "messages": { "error": "Token expired" } }');
+                if ($this->retry) {
+                    $this->retry = FALSE; // prevent cycle
+                    $this->login($this->username, $this->password);
+                    $response = $this->request($method, $url, $data);
+                    $this->retry = TRUE;
+                    return $response;
+                } else {
+                    throw new KupNajistoException('{ "messages": { "error": "Token expired" } }');
+                }
+            } else {
+                throw new KupNajistoException($response);
             }
-            throw new KupNajistoException($response);
         }
 
         curl_close($curl);
