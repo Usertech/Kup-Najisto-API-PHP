@@ -48,14 +48,10 @@ class KupNajistoApi
      */
     private function login($username = '', $password = '')
     {
-        try {
-            $response = $this->request('POST', 'login/api/', compact('username', 'password'));
-            self::$token = $response['token'];
-            $this->headers['Authorization'] = 'Authorization: '.self::$token;
-            return $response;
-        } catch (KupNajistoException $e) {
-            throw $e;
-        }
+        $response = $this->request('POST', 'login/api/', compact('username', 'password'));
+        self::$token = $response['token'];
+        $this->headers['Authorization'] = 'Authorization: '.self::$token;
+        return $response;
     }
 
     /**
@@ -65,11 +61,7 @@ class KupNajistoApi
      */
     public function createOrder($data = array())
     {
-        try {
-            return $this->request('POST', 'order/api/', $data);
-        } catch (KupNajistoException $e) {
-            throw $e;
-        }
+        return $this->request('POST', 'order/api/', $data);
     }
 
     /**
@@ -90,11 +82,7 @@ class KupNajistoApi
      */
     public function updateOrder($id = NULL, $data = NULL)
     {
-        try {
-            return $this->request('PUT', 'order/api/'.$id.'/', $data);
-        } catch (KupNajistoException $e) {
-            throw $e;
-        }
+        return $this->request('PUT', 'order/api/'.$id.'/', $data);
     }
 
     /*
@@ -126,7 +114,7 @@ class KupNajistoApi
         $response = curl_exec($curl);
 
         if (curl_errno($curl)) {
-            throw new KupNajistoException('Curl error: ' . curl_error($curl));
+            throw new KupNajistoException('Curl error: ' . curl_error($curl), curl_errno($curl));
         }
 
         $info = curl_getinfo($curl);
@@ -140,10 +128,10 @@ class KupNajistoApi
                     $this->retry = TRUE;
                     return $response;
                 } else {
-                    throw new KupNajistoException('{ "messages": { "error": "Token expired" } }');
+                    throw new KupNajistoException('{ "messages": { "error": "Token expired" } }', $info['http_code']);
                 }
             } else {
-                throw new KupNajistoException($response);
+                throw new KupNajistoException($response, $info['http_code']);
             }
         }
 
