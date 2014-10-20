@@ -7,7 +7,7 @@
  * @link https://github.com/Usertech/Kup-Najisto-API-PHP
  * @author Michal Vlcek <vlcek@usertechnologies.com>
  * @copyright 2014 UserTechnologies s.r.o. - http://usertechnologies.com/
- * @version 0.1
+ * @version 0.1.1
  */
 class KupNajistoApi
 {
