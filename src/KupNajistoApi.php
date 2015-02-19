@@ -7,7 +7,7 @@
  * @link https://github.com/Usertech/Kup-Najisto-API-PHP
  * @author Michal Vlcek <vlcek@usertechnologies.com>
  * @copyright 2014 UserTechnologies s.r.o. - http://usertechnologies.com/
- * @version 0.1.1
+ * @version 0.1.2
  */
 class KupNajistoApi
 {
@@ -45,10 +45,11 @@ class KupNajistoApi
      * Performs POST login request
      * @param  string $username
      * @param  string $password
+     * @return array $response
      */
     private function login($username = '', $password = '')
     {
-        $response = $this->request('POST', 'login/api/', compact('username', 'password'));
+        $response = $this->request('POST', 'api/login/', compact('username', 'password'));
         self::$token = $response['token'];
         $this->headers['Authorization'] = 'Authorization: '.self::$token;
         return $response;
@@ -61,12 +62,12 @@ class KupNajistoApi
      */
     public function createOrder($data = array())
     {
-        return $this->request('POST', 'order/api/', $data);
+        return $this->request('POST', 'api/order/', $data);
     }
 
     /**
      * Performs PUT request to create order
-     * @param  array $data
+     * @param  int $id
      * @return array $response json response
      */
     public function confirmOrder($id = NULL)
@@ -82,7 +83,7 @@ class KupNajistoApi
      */
     public function updateOrder($id = NULL, $data = NULL)
     {
-        return $this->request('PUT', 'order/api/'.$id.'/', $data);
+        return $this->request('PUT', 'api/order/'.$id.'/', $data);
     }
 
     /*

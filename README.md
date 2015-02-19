@@ -4,18 +4,18 @@ Příklad [zde](https://github.com/vlcekmi3/kupnajisto-api/blob/master/example.p
 
 ``` php
 try {
-    $api = new KupNajistoApi('username', 'password', 'http://knj.rychmat.eu/');
+    $api = new KupNajistoApi('vas@email.cz', 'vaseheslo', 'https://app.kupnajisto.cz/');
 
-    $response = $api->createOrder($orderData);
-    var_dump($response); // (json) odpoved jako associativni pole
+    $response = $api->createOrder( $orderData );
+    var_dump($response); // json response as assoc array
 
     // $response['id'] --> id
     // $response['state'] --> stav 3 - schvaleno, 4 - zamitnuto
     // $response['admin_field_rest_scoring_msg'] --> zprava o zamitnuti
 
     if ($response['state'] == 3) {
-        $response = $api->confirmOrder($response['id']); // potvrzeni objednavky
-        $response = $api->updateOrder($response['id'], array('total_price' => 120)); // uprava objednavky - zmena ceny
+        $response = $api->confirmOrder( $response['id'] ); // potvrzeni objednavky
+        $response = $api->updateOrder( $response['id'], array('total_price' => 120) ); // uprava objednavky - zmena ceny
     }
 
 } catch (KupNajistoException $e) {
