@@ -102,15 +102,18 @@ class KupNajistoApi
             curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
         }
 
+        // Headers array copy
+        $headers = $this->headers;
         if (in_array($method, array('POST', 'PUT'))) {
             $len = ($data === NULL)? 0 : strlen(json_encode($data));
-            $this->headers['Content-Length'] = 'Content-Length: '.$len;
+            $headers['Content-Length'] = 'Content-Length: '.$len;
         }
 
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array_values($this->headers));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array_values($headers));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($curl, CURLOPT_URL, $this->apiUrl . $url);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 
         $response = curl_exec($curl);
 
@@ -151,4 +154,3 @@ class KupNajistoException extends Exception
     
 }
 
-?>
