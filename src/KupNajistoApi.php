@@ -56,6 +56,16 @@ class KupNajistoApi
     }
 
     /**
+     * Performs GET request to get order details
+     * @param  int $id
+     * @return array $response json response
+     */
+    public function getOrder($id)
+    {
+        return $this->request('GET', 'api/order/'.$id.'/');
+    }
+
+    /**
      * Performs POST request to create order
      * @param  array $data
      * @return array $response json response
