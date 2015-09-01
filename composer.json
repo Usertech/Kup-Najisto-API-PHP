@@ -1,0 +1,17 @@
+{
+	"name": "usertech/kupnajisto-api-php",
+	"description": "KupNajisto PHP API",
+	"homepage": "https://github.com/Usertech/Kup-Najisto-API-PHP",
+	"keywords": ["kup", "najisto", "KupNajisto", "api"],
+	"type": "library",
+	"autoload": {
+		"psr-4": {
+			"KNJ\\": "src/"
+		}
+	},
+	"require": {
+		"php": ">=5.3.2"
+	},
+	"require-dev": {
+	}
+}

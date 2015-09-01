@@ -1,6 +1,9 @@
 <?php
+// instal via `composer install`
+require_once('vendor/autoload.php');
 
-require_once('src/KupNajistoApi.php');
+use KNJ\KupNajistoApi;
+use KNJ\Exception\KupNajistoException;
 
 $address = array(
     'name' => 'Karel Holan',
@@ -50,6 +53,7 @@ $orderData = array(
 try {
     $api = new KupNajistoApi('vas@email.cz', 'vaseheslo', 'https://app.kupnajisto.cz/');
 
+    // $api->co
     $response = $api->createOrder( $orderData );
     var_dump($response); // json response as assoc array
 

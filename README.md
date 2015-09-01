@@ -1,6 +1,9 @@
 PHP implementace pro přístup k API platební metody [http://www.kupnajisto.cz](http://www.kupnajisto.cz).
 
-Příklad [zde](https://github.com/vlcekmi3/kupnajisto-api/blob/master/example.php):
+### # instalace
+* `composer install`
+
+### # příklad [[zde](https://github.com/Usertech/Kup-Najisto-API-PHP/blob/master/example.php)]:
 
 ``` php
 try {
