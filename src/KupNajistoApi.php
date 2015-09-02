@@ -14,33 +14,33 @@ use KNJ\Exception\KupNajistoException;
  * @version 0.1.2
  */
 class KupNajistoApi {
-	/** @var string auth token  */
+	/** @var string auth token */
 	private static $token = '';
 
-	/** @var array  */
+	/** @var array */
 	private $headers = array(
 		'Accept' => 'Accept: application/json',
 		'Content-Type' => 'Content-Type: application/json'
 	);
 
-	/** @var string  */
+	/** @var string */
 	private $apiUrl = 'https://app.kupnajisto.cz';
 
-	/** @var string  */
+	/** @var string */
 	private $username = '';
 
-	/** @var string  */
+	/** @var string */
 	private $password = '';
 
-	/** @var boolean  */
+	/** @var boolean */
 	private $retry = TRUE;
 
 	public function __construct($username = '', $password = '', $url = '') {
 		$this->username = $username;
 		$this->password = $password;
-		$this->apiUrl = $url;
+		$this->apiUrl = rtrim($url, "/").'/';
 
-		$this->login($username, $password);
+		 $this->login($username, $password);
 	}
 
 	/**
@@ -52,7 +52,7 @@ class KupNajistoApi {
 	private function login($username = '', $password = '') {
 		$response = $this->request('POST', 'api/login/', compact('username', 'password'));
 		self::$token = $response['token'];
-		$this->headers['Authorization'] = 'Authorization: '.self::$token;
+		$this->headers['Authorization'] = 'Authorization: ' . self::$token;
 		return $response;
 	}
 
@@ -62,7 +62,7 @@ class KupNajistoApi {
 	 * @return array $response json response
 	 */
 	public function getOrder($id) {
-		return $this->request('GET', 'api/order/'.$id.'/');
+		return $this->request('GET', 'api/order/' . $id . '/');
 	}
 
 	/**
@@ -90,7 +90,7 @@ class KupNajistoApi {
 	 * @return array $response json response
 	 */
 	public function updateOrder($id = NULL, $data = NULL) {
-		return $this->request('PUT', 'api/order/'.$id.'/', $data);
+		return $this->request('PUT', 'api/order/' . $id . '/', $data);
 	}
 
 	/*
@@ -105,14 +105,15 @@ class KupNajistoApi {
 		$curl = curl_init();
 
 		if ($data !== NULL) {
+			$data = $this->objectToArray($data);
 			curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
 		}
 
 		// Headers array copy
 		$headers = $this->headers;
 		if (in_array($method, array('POST', 'PUT'))) {
-			$len = ($data === NULL)? 0 : strlen(json_encode($data));
-			$headers['Content-Length'] = 'Content-Length: '.$len;
+			$len = ($data === NULL) ? 0 : strlen(json_encode($data));
+			$headers['Content-Length'] = 'Content-Length: ' . $len;
 		}
 
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array_values($headers));
@@ -128,7 +129,7 @@ class KupNajistoApi {
 		}
 
 		$info = curl_getinfo($curl);
-		if ( !in_array($info['http_code'], array(200, 201)) ) {
+		if (!in_array($info['http_code'], array(200, 201))) {
 			// expired token - try autologin
 			if ($info['http_code'] === 403) {
 				if ($this->retry) {
@@ -148,6 +149,31 @@ class KupNajistoApi {
 		curl_close($curl);
 
 		return json_decode($response, TRUE);
+	}
+
+	/**
+	 * Converts given object  assoc array, recursively.
+	 *
+	 * @param object|array $object
+	 * @return array|string
+	 */
+	protected function objectToArray($object) {
+		if (is_object($object)) {
+			$result = array();
+			$reflectorClass = new \ReflectionClass(get_class($object));
+			foreach ($reflectorClass->getProperties() as $prop) {
+				$prop->setAccessible(true);
+				$result[$prop->name] = $this->objectToArray($prop->getValue($object));
+			}
+			return $result;
+		} else if (is_array($object)) {
+			$result = array();
+			foreach ($object as $key => $value) {
+				$result[$key] = $this->objectToArray($value);
+			}
+			return $result;
+		}
+		return $object;
 	}
 
 }
