@@ -1,20 +1,6 @@
-PHP implementace pro přístup k API platební metody [http://www.kupnajisto.cz](http://www.kupnajisto.cz).
-
-### # changelog
-* přidány namespaces
-* dostupné jako composer package
-* práce API s objekty, namísto associativního pole
-
-### # instalace
-* jako závislost v composeru: `composer require usertech/kupnajisto-api-php`
-* nebo jako standalone verze: `composer install`
-
-### # příklad
-
-* [[tvorba pomocí objektů](https://github.com/Usertech/Kup-Najisto-API-PHP/blob/master/example.php)]:
-* [[tvorba pomocí builderu](https://github.com/Usertech/Kup-Najisto-API-PHP/blob/master/example_builder.php)]:
-
-``` php
+<?php
+// file is generated via `composer install`
+require_once('vendor/autoload.php');
 
 use KNJ\KupNajistoApi;
 use KNJ\Exception\KupNajistoException;
@@ -65,4 +51,5 @@ try {
 } catch (KupNajistoException $e) {
 	var_dump(json_decode($e->getMessage(), TRUE));
 }
-```
+
+?>
