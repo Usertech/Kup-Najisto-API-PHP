@@ -33,4 +33,6 @@ class DeliveryTypes extends BasicEnum {
 	const TNT = 12;
 	const GLS = 13;
 	const CZECH_POST_OTHERS = 14;
+	const HDS_KOMFORT = 15;
+	const HDS_STANDARD = 16;
 }
