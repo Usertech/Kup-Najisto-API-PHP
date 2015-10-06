@@ -1,6 +1,6 @@
 <?php
 
-namespace KNJ\Object;
+namespace KNJ\Object\Enum;
 
 /**
  * Delivery type enum.
@@ -16,7 +16,7 @@ namespace KNJ\Object;
  * @copyright 2015 UserTechnologies s.r.o. - http://usertechnologies.com/
  * @version 0.1.2
  */
-class DeliveryTypes {
+class DeliveryTypes extends BasicEnum {
 	const __default = self::CZECH_POST_TO_HAND;
 
 	const CZECH_POST_TO_HAND = 1;

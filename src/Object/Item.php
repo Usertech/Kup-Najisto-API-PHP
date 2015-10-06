@@ -2,6 +2,8 @@
 
 namespace KNJ\Object;
 
+use KNJ\Object\Enum\ItemStateTypes;
+
 /**
  * API for payment method Kup Najisto
  * http://www.kupnajisto.cz/
@@ -110,9 +112,14 @@ class Item {
 	}
 
 	/**
-	 * @param int $state
+	 * Usage: $item->setState(ItemStateTypes::RETURNED);
+	 * @param int ItemStateTypes $state
+	 * @throws UnexpectedValueException
 	 */
 	public function setState($state) {
+		if (!ItemStateTypes::isValidValue($state)) {
+			throw new \KNJ\Exception\InvalidArgumentException("Unexpected item state: $state");
+		}
 		$this->state = $state;
 	}
 

@@ -4,7 +4,7 @@ require_once('vendor/autoload.php');
 
 use KNJ\KupNajistoApi;
 use KNJ\Exception\KupNajistoException;
-use KNJ\Object\DeliveryTypes;
+use KNJ\Object\Enum\DeliveryTypes;
 use KNJ\OrderBuilder;
 
 $orderData = array(
