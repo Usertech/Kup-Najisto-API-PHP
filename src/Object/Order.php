@@ -2,6 +2,8 @@
 
 namespace KNJ\Object;
 
+use KNJ\Object\Enum\DeliveryTypes;
+
 /**
  * API for payment method Kup Najisto
  * http://www.kupnajisto.cz/
@@ -74,7 +76,7 @@ class Order {
 	 */
 	public function __construct() {
 		$this->paygate = true;
-		$this->delivery_state = 1;
+		$this->delivery_state = DeliveryTypes::CZECH_POST_TO_HAND;
 	}
 
 	/**
@@ -194,9 +196,14 @@ class Order {
 	}
 
 	/**
-	 * @param int $delivery_state
+	 * Usage: $order->setDeliveryState(DeliveryTypes::PPL);
+	 * @param int DeliveryTypes $delivery_state
+	 * @throws UnexpectedValueException
 	 */
 	public function setDeliveryState($delivery_state) {
+		if (!DeliveryTypes::isValidValue($delivery_state)) {
+			throw new \KNJ\Exception\InvalidArgumentException("Unexpected delivery state: $delivery_state");
+		}
 		$this->delivery_state = $delivery_state;
 	}
 
@@ -349,7 +356,7 @@ class Order {
 	public function setItems(array $items) {
 		foreach ($items as $item) {
 			if (!$item instanceof Item) {
-				throw new \KNJ\InvalidArgumentException("Given array parameter contains element of different type than '\KNJ\Item'");
+				throw new \KNJ\Exception\InvalidArgumentException("Given array parameter contains element of different type than '\KNJ\Item'");
 			}
 		}
 
@@ -380,7 +387,7 @@ class Order {
 	public function setInvoices(array $invoices) {
 		foreach ($invoices as $invoice) {
 			if (!$invoice instanceof Invoice) {
-				throw new \KNJ\InvalidArgumentException("Given array parameter contains element of different type than '\KNJ\Invoice'");
+				throw new \KNJ\Exception\InvalidArgumentException("Given array parameter contains element of different type than '\KNJ\Invoice'");
 			}
 		}
 

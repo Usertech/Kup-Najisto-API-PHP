@@ -18,7 +18,7 @@ PHP implementace pro přístup k API platební metody [http://www.kupnajisto.cz]
 
 use KNJ\KupNajistoApi;
 use KNJ\Exception\KupNajistoException;
-use KNJ\Object\DeliveryTypes;
+use KNJ\Object\Enum\DeliveryTypes;
 use KNJ\OrderBuilder;
 
 $orderData = array(
