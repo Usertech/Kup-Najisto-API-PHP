@@ -17,6 +17,9 @@ class KupNajistoApi {
 	/** @var string auth token */
 	private static $token = '';
 
+	/** @var string basic auth */
+	private $basicAuth = '';
+
 	/** @var array */
 	private $headers = array(
 		'Accept' => 'Accept: application/json',
@@ -33,27 +36,28 @@ class KupNajistoApi {
 	private $password = '';
 
 	/** @var boolean */
+	private $dev = FALSE;
+
+	/** @var boolean */
 	private $retry = TRUE;
 
-	public function __construct($username = '', $password = '', $url = '') {
+	/**
+	 * KupNajistoApi constructor.
+	 * @param string $username
+	 * @param string $password
+	 * @param string $url
+	 * @param bool|FALSE $dev
+	 * @param bool $basicAuth format: 'user:password' in plaintext (only used if $dev is set to true)
+	 */
+	public function __construct($username = '', $password = '', $url = '', $dev = FALSE, $basicAuth) {
 		$this->username = $username;
 		$this->password = $password;
 		$this->apiUrl = rtrim($url, "/").'/';
 
-		 $this->login($username, $password);
-	}
+		$this->dev = $dev;
+		$this->basicAuth = $basicAuth;
 
-	/**
-	 * Performs POST login request
-	 * @param  string $username
-	 * @param  string $password
-	 * @return array $response
-	 */
-	private function login($username = '', $password = '') {
-		$response = $this->request('POST', 'api/login/', compact('username', 'password'));
-		self::$token = $response['token'];
-		$this->headers['Authorization'] = 'Authorization: ' . self::$token;
-		return $response;
+		 $this->login($username, $password);
 	}
 
 	/**
@@ -93,13 +97,44 @@ class KupNajistoApi {
 		return $this->request('PUT', 'api/order/' . $id . '/', $data);
 	}
 
-	/*
+	/**
+	 * Performs POST login request
+	 * @param  string $username
+	 * @param  string $password
+	 * @return array $response
+	 */
+	private function login($username = '', $password = '') {
+		$this->setAuthHeaders($this->dev);
+		$response = $this->request('POST', 'api/login/', compact('username', 'password'));
+		self::$token = $response['token'];
+		$this->setAuthHeaders($this->dev);
+		return $response;
+	}
+
+	/**
+	 * Sets Authorization headers.
+	 * Takes into account development environment given by $dev parameter.
+	 * @param $dev
+	 */
+	private function setAuthHeaders($dev) {
+		$authHeader = 'Authorization';
+		if ($dev) {
+			$authHeader = 'X-Authorization';
+			$this->headers['Authorization'] = 'Basic: ' . base64_encode($this->basicAuth);
+		}
+
+		if (self::$token) {
+			$this->headers[$authHeader] = 'Authorization: ' . self::$token;
+		}
+	}
+
+	/**
 	 * Perform an API request
 	 * @param string $method
 	 * @param string $url
 	 * @param array $data
 	 * @return array $response json response
-	 * @throws \KupNajisto\Exception\KupNajistoException if any error occur
+	 * @throws \KNJ\Exception\KupNajistoException if any error occur
 	 */
 	private function request($method, $url, $data = NULL) {
 		$curl = curl_init();
@@ -157,7 +192,7 @@ class KupNajistoApi {
 	 * @param object|array $object
 	 * @return array|string
 	 */
-	protected function objectToArray($object) {
+	private function objectToArray($object) {
 		if (is_object($object)) {
 			$result = array();
 			$reflectorClass = new \ReflectionClass(get_class($object));

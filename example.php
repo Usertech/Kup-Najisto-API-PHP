@@ -10,7 +10,7 @@ use KNJ\Object\File;
 use KNJ\Object\Invoice;
 use KNJ\Object\Item;
 use KNJ\Object\Order;
-use KNJ\Object\DeliveryTypes;
+use KNJ\Object\Enum\DeliveryTypes;
 
 $address = new Address('Karel Holan', 'CR', 'Ulice 123', '120 00', 'Praha');
 $customer = new Customer('Karel Holan', 'karel.holan@rychmat.euxx', '890707/0029', '100786676', '2024-04-24');
@@ -43,7 +43,7 @@ $orderData = array(
 $order->setParamsFromArray($orderData);
 
 try {
-	$api = new KupNajistoApi('vas@email.cz', 'vaseheslo', 'https://app.kupnajisto.cz/');
+	$api = new KupNajistoApi('vas@email.cz', 'vaseheslo', 'https://app.dev.kupnajisto.cz/', true, 'user:password');
 	$response = $api->createOrder($order);
 	var_dump($response); // json response as assoc array
 
