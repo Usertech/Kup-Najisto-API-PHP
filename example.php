@@ -43,7 +43,7 @@ $orderData = array(
 $order->setParamsFromArray($orderData);
 
 try {
-	$api = new KupNajistoApi('vas@email.cz', 'vaseheslo', 'https://app.dev.kupnajisto.cz/', true, 'user:password');
+	$api = new KupNajistoApi('vas@email.cz', 'vaseheslo', 'https://app.dev.kupnajisto.cz/', 'user:password');
 	$response = $api->createOrder($order);
 	var_dump($response); // json response as assoc array
 
