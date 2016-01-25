@@ -11,7 +11,7 @@ PHP implementace pro přístup k API platební metody [http://www.kupnajisto.cz]
 
 ### # příklad
 
-* [[tvorba pomocí objektů](https://github.com/Usertech/Kup-Najisto-API-PHP/blob/master/example.php)]:
+* [[tvorba pomocí objektů (debug verze)](https://github.com/Usertech/Kup-Najisto-API-PHP/blob/master/example.php)]:
 * [[tvorba pomocí builderu](https://github.com/Usertech/Kup-Najisto-API-PHP/blob/master/example_builder.php)]:
 
 ``` php
