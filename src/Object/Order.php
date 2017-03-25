@@ -27,7 +27,7 @@ class Order {
 	private $items = array();
 
 	/** @var array */
-	private $invoices = array();
+	private $invoices = array("add" => array());
 
 	/** @var string */
 	private $tin;
@@ -376,7 +376,7 @@ class Order {
 	 * @param \KNJ\Object\Invoice invoice
 	 */
 	public function addInvoice(Invoice $invoice) {
-		$this->invoices[] = $invoice;
+		$this->invoices["add"][] = $invoice;
 	}
 
 	/**
@@ -391,7 +391,7 @@ class Order {
 			}
 		}
 
-		$this->invoices = $invoices;
+		$this->invoices["add"] = $invoices;
 	}
 
 	/**
